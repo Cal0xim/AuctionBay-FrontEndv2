@@ -5,10 +5,9 @@ import ProfileMenu from "../ui/ProfileMenu";
 
 interface RightNavProps {
   avatarSrc: string;
-  onNotify?: () => void;
 }
 
-function RightNav({ avatarSrc, onNotify }: RightNavProps) {
+function RightNav({ avatarSrc }: RightNavProps) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
