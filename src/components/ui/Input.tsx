@@ -1,5 +1,3 @@
-import React from "react";
-
 type InputState = "default" | "hover" | "active" | "filled";
 
 type InputProps = {
@@ -29,8 +27,7 @@ export default function Input({
   onChange,
 }: InputProps) {
   return (
-    <div className="flex flex-col gap-2 w-[320px]">
-      
+    <div className="flex flex-col gap-2 w-full">
       {label && (
         <label className="text-[#071015] text-base font-light">
           {label}
@@ -50,6 +47,9 @@ export default function Input({
           text-base font-light
           outline-none
           transition
+          [appearance:textfield]
+          [&::-webkit-outer-spin-button]:appearance-none
+          [&::-webkit-inner-spin-button]:appearance-none
           ${stateStyles[state]}
           focus:border-[#F4FF47]
           ${className}

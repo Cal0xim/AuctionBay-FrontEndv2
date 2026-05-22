@@ -1,15 +1,26 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import api from '../api/axios';
-import { formatMoney } from '../utils/formatMoney';
-import { useError } from '../utils/ErrorDisplay';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import api from "../api/axios";
+
+import NavBar from "../components/ui/NavBar";
+import Tag from "../components/ui/Tagv2";
+import TimeTag from "../components/ui/TimeTag";
+import Input from "../components/ui/Input";
+import Button from "../components/ui/Button";
+
+import { formatMoney } from "../utils/formatMoney";
+import { useError } from "../utils/ErrorDisplay";
+import { formatTime } from "../utils/formatTime";
+import { getTimeVariant } from "../utils/timeVariant";
 
 function AuctionDetail() {
   const { id } = useParams();
 
   const [auction, setAuction] = useState<any>(null);
-  const [bidAmount, setBidAmount] = useState<string>('');
-  const {setError } = useError();
+  const [bidAmount, setBidAmount] = useState<string>("");
+
+  const { setError } = useError();
+
   const [loading, setLoading] = useState(true);
   const [loadingBid, setLoadingBid] = useState(false);
 
@@ -18,8 +29,6 @@ function AuctionDetail() {
       try {
         const res = await api.get(`/auctions/${id}`);
         setAuction(res.data);
-      } catch (err) {
-        console.log(err);
       } finally {
         setLoading(false);
       }
@@ -46,161 +55,133 @@ function AuctionDetail() {
       const res = await api.get(`/auctions/${id}`);
       setAuction(res.data);
 
-      setBidAmount('');
+      setBidAmount("");
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Bid failed');
+      setError(err?.response?.data?.message || "Bid failed");
     } finally {
       setLoadingBid(false);
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (!auction) return <p>Auction not found</p>;
+  if (loading) return <div className="p-8">Loading...</div>;
+  if (!auction) return <div className="p-8">Auction not found</div>;
 
-  const isEnded = auction.status !== 'ACTIVE';
+  const isEnded = auction.status !== "ACTIVE";
 
   const sortedBids = [...(auction.bids || [])].sort(
     (a, b) => b.amount - a.amount
   );
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>{auction.title}</h1>
+    <div className="flex flex-col min-h-screen bg-[#F6F6F4]">
+      <NavBar activeTab="right" />
 
-      {/* MAIN LAYOUT */}
-      <div style={{ display: 'flex', gap: 30, marginTop: 20 }}>
-        
-        {/* LEFT SIDE - IMAGE */}
-        <div style={{ flex: 1 }}>
+      <div className="flex px-8 pt-[120px] pb-8 gap-4">
+
+        <div className="flex-1">
           <img
-            src={auction.image}
-            alt={auction.title}
-            style={{
-              width: '100%',
-              maxWidth: 500,
-              height: 350,
-              objectFit: 'cover',
-              borderRadius: 10,
-            }}
+            src={auction.image || "/placeholder_auction.png"}
+            className="w-full h-[888px] object-cover rounded-2xl"
           />
         </div>
 
-        {/* RIGHT SIDE - INFO */}
-        <div style={{ flex: 1 }}>
-          <p style={{ fontSize: 16 }}>{auction.description}</p>
+        <div className="flex flex-col gap-4 w-[680px]">
 
-          <h2>{formatMoney(auction.currentPrice)}</h2>
+          <div className="bg-white rounded-2xl p-4 flex flex-col gap-4">
 
-          <p>
-            Ends:{' '}
-            {new Date(auction.endDate).toLocaleString('en-US', {
-              dateStyle: 'medium',
-              timeStyle: 'short',
-            })}
-          </p>
+            <div className="flex justify-between items-center">
+              <Tag variant={auction.status === "ACTIVE" ? "InProgress" : "Done"} />
 
-          <span
-            style={{
-              display: 'inline-block',
-              padding: '5px 10px',
-              borderRadius: 6,
-              background: auction.status === 'ACTIVE' ? 'green' : 'red',
-              color: 'white',
-              fontSize: 12,
-            }}
-          >
-            {auction.status}
-          </span>
-
-          {auction.status !== 'ACTIVE' && (
-            <p style={{ marginTop: 10 }}>
-              Winner:{"🏆 "}
-              <strong>
-                {auction.winner?.username || 'No bids'}
-              </strong>
-            </p>
-          )}
-
-          <p style={{ marginTop: 10 }}>
-            Bids: {auction._count?.bids ?? sortedBids.length}
-          </p>
-
-          <hr />
-
-          {!isEnded && (
-            <div style={{ marginTop: 20 }}>
-              <input
-                type="number"
-                value={bidAmount}
-                onChange={(e) => setBidAmount(e.target.value)}
-                style={{ padding: 8, width: 200 }}
-                placeholder="Enter bid amount"
+              <TimeTag
+                time={formatTime(auction.endDate)}
+                variant={getTimeVariant(auction.endDate)}
               />
+            </div>
 
-              <button
-                onClick={handleBid}
-                disabled={
-                  loadingBid ||
-                  !bidAmount ||
-                  Number(bidAmount) <= auction.currentPrice
-                }
-                style={{
-                  marginLeft: 10,
-                  padding: '8px 12px',
-                  cursor: 'pointer',
-                  opacity:
-                    loadingBid ||
-                    !bidAmount ||
-                    Number(bidAmount) <= auction.currentPrice
-                      ? 0.5
-                      : 1,
-                }}
-              >
-                {loadingBid ? 'Placing bid...' : 'Place Bid'}
-              </button>
+            <h1 className="text-[32px] font-bold">
+              {auction.title}
+            </h1>
+
+            <p className="text-base font-light leading-6">
+              {auction.description}
+            </p>
+
+            <h2 className="text-2xl font-semibold">
+              {formatMoney(auction.currentPrice)}
+            </h2>
+
+            {!isEnded && (
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <span>Bid:</span>
+
+                <Input
+                  type="number"
+                  value={bidAmount}
+                  onChange={setBidAmount}
+                  placeholder={String(auction.currentPrice + 1) + "€"}
+                />
+
+                <Button onClick={handleBid} disabled={loadingBid}>
+                  {loadingBid ? "Placing..." : "Place bid"}
+                </Button>
+              </div>
+            )}
+
+            {isEnded && (
+              <p className="text-red-500 mt-2">
+                Auction has ended
+              </p>
+            )}
+          </div>
+
+          <div className="bg-white rounded-2xl p-4 flex flex-col gap-4">
+
+            <h3 className="text-[23px] font-bold">
+              Bidding history ({auction._count?.bids})
+            </h3>
+
+            <div className="flex flex-col">
+
+              {sortedBids.map((bid: any) => (
+                <div
+                  key={bid.id}
+                  className="flex items-center justify-between py-2 border-b border-[#EDF4F2]"
+                >
+
+                  <div className="flex items-center gap-4">
+
+                    <img
+                      src={bid.user?.image || "/placeholderPFP.png"}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+
+                    <p className="text-base font-light">
+                      {bid.user?.username || "Unknown user"}
+                    </p>
+
+                  </div>
+
+                  <p className="text-base font-light">
+                    {new Date(bid.createdAt).toLocaleString()}
+                  </p>
+
+                  <div className="flex items-center gap-1 px-4 py-1.5 bg-[#F4FF47] rounded-2xl">
+                    <p className="font-semibold text-[#272D2D]">
+                      {bid.amount}
+                    </p>
+
+                    <span className="text-[#272D2D]">€</span>
+                  </div>
+
+                </div>
+              ))}
 
             </div>
-          )}
 
-          {isEnded && (
-            <p style={{ color: 'red', marginTop: 20 }}>
-              Auction has ended
-            </p>
-          )}
+          </div>
+
         </div>
       </div>
-
-      {/* BID HISTORY */}
-      <hr style={{ marginTop: 30 }} />
-
-      <h3>Bid History</h3>
-
-      {sortedBids.length === 0 ? (
-        <p>No bids yet</p>
-      ) : (
-        sortedBids.map((bid: any, index: number) => {
-          let fontSize = '14px';
-
-          if (index === 0) fontSize = '28px';
-          else if (index === 1) fontSize = '20px';
-          else if (index === 2) fontSize = '16px';
-
-          return (
-            <div
-              key={bid.id}
-              style={{
-                padding: 8,
-                borderBottom: '1px solid #eee',
-                fontSize,
-                fontWeight: index === 0 ? 'bold' : 'normal',
-                background: index === 0 ? '#e8fff0' : 'transparent',
-              }}
-            >
-              {formatMoney(bid.amount)}
-            </div>
-          );
-        })
-      )}
     </div>
   );
 }

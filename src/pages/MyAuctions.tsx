@@ -1,100 +1,93 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import api from '../api/axios';
-import { useError } from '../utils/ErrorDisplay';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-function MyAuctions() {
-  const [auctions, setAuctions] = useState<any[]>([]);
+import api from "../api/axios";
+
+import NavBar from "../components/ui/NavBar";
+import Card from "../components/ui/Cardv2";
+import Tab from "../components/ui/Tab";
+
+import type { Auction } from "../types/Auction";
+
+import { useError } from "../utils/ErrorDisplay";
+
+type TabType = "mine" | "bidding" | "won";
+
+export default function MyAuctions() {
+  const [tab, setTab] = useState<TabType>("mine");
+  const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
+
   const { setError } = useError();
 
   useEffect(() => {
-    const fetchMyAuctions = async () => {
+    const fetchData = async () => {
+      setLoading(true);
+
       try {
-        const res = await api.get('/me/auction');
-        setAuctions(res.data.data || res.data);
+        const url =
+          tab === "mine"
+            ? "/me/auction"
+            : tab === "bidding"
+            ? "/me/bids"
+            : "/me/won";
+
+        const res = await api.get(url);
+        setAuctions(res.data.data || res.data || []);
       } catch (err: any) {
-        setError(err?.response?.data?.message || 'Failed to load your auctions');
+        setError(err?.response?.data?.message || "Failed to load auctions");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMyAuctions();
-  }, []);
-
-  if (loading) return <p>Loading...</p>;
+    fetchData();
+  }, [tab]);
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>My Auctions</h1>
+    <div className="flex flex-col min-h-screen bg-[#F6F6F4]">
+      <NavBar activeTab="right" />
 
-      {auctions.length === 0 ? (
-        <p>You have no auctions yet</p>
-      ) : (
-        auctions.map((a) => (
-          <div
-            key={a.id}
-            style={{
-              border: '1px solid #ccc',
-              padding: 10,
-              marginBottom: 10,
-              position: 'relative',
-            }}
-          >
+      <div className="flex flex-col gap-4 pt-[174px] flex-1">
 
-            <img
-            src={a.image}
-            alt={a.title}
-            style={{
-                width: '100%',
-                maxWidth: 250,
-                height: 180,
-                objectFit: 'cover',
-                borderRadius: 8,
-                marginBottom: 10,
-            }}
-            />
+        <div className="px-8">
+          <Tab
+            tabs={[
+              { label: "My auctions" },
+              { label: "Bidding" },
+              { label: "Won" },
+            ]}
+            activeIndex={tab === "mine" ? 0 : tab === "bidding" ? 1 : 2}
+            onChange={(i) =>
+              setTab(i === 0 ? "mine" : i === 1 ? "bidding" : "won")
+            }
+          />
+        </div>
 
-            <h3>
-              <Link to={`/auctions/${a.id}`}>
-                {a.title}
-              </Link>
-            </h3>
+        <div className="flex flex-wrap gap-4 px-8 pb-8">
 
-            <p>Highest Bid: {a.currentPrice}</p>
+          {loading ? (
+            <p>Loading...</p>
+          ) : auctions.length === 0 ? (
+            <p>No auctions found</p>
+          ) : (
+            auctions.map((a) =>
+              tab === "mine" ? (
+                <Card
+                  key={a.id}
+                  a={a}
+                  variant="editable"
+                />
+              ) : (
+                <Link key={a.id} to={`/auctions/${a.id}`}>
+                  <Card a={a} />
+                </Link>
+              )
+            )
+          )}
 
-            <p>
-            Ends:{' '}
-            {new Date(a.endDate).toLocaleString('en-US', {
-                dateStyle: 'medium',
-                timeStyle: 'short',
-                })}
-            </p>
-
-            <p>Status: {a.status}</p>
-
-            <Link
-              to={`/edit-auction/${a.id}`}
-              style={{
-                position: 'absolute',
-                bottom: 10,
-                right: 10,
-                padding: '6px 10px',
-                backgroundColor: '#000',
-                color: '#fff',
-                borderRadius: 4,
-                textDecoration: 'none',
-                fontSize: 12,
-              }}
-            >
-              Edit
-            </Link>
-          </div>
-        ))
-      )}
+        </div>
+      </div>
     </div>
   );
 }
-
-export default MyAuctions;

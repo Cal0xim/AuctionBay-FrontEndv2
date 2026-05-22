@@ -8,7 +8,6 @@ import AuctionDetail from './pages/AuctionDetail.tsx';
 import MyAuctions from './pages/MyAuctions.tsx';
 import EditAuction from './pages/EditAuction.tsx';
 
-import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import ErrorBanner from './components/ErrorBanner';
 
@@ -16,8 +15,6 @@ import ErrorBanner from './components/ErrorBanner';
 function App() {
   return (
     <BrowserRouter>
-
-      <Navbar />
       <ErrorBanner />
         <Routes> 
         <Route path="/auctions" element={<Auctions />} />

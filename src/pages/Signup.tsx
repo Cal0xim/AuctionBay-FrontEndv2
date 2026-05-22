@@ -1,21 +1,17 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import api from "../api/axios";
 import { useError } from "../utils/ErrorDisplay";
 
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
-import Logo from "../components/ui/Logo";
-import LeftNavigation from "../components/ui/LeftNavigation";
+import LeftNavigation from "../components/ui/LeftNav";
 
 function Signup() {
   const navigate = useNavigate();
 
-  const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
-  const [email, setEmail] = useState("");
+  const [username, setUser] = useState("");
   const [password, setPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
 
   const { setError } = useError();
   const [loading, setLoading] = useState(false);
@@ -26,10 +22,8 @@ function Signup() {
 
     try {
       await api.post("/auth/signup", {
-        name,
-        surname,
-        email,
-        password,
+        username: username,
+        password: password,
       });
 
       navigate("/login");
@@ -43,74 +37,68 @@ function Signup() {
   return (
     <div className="min-h-screen w-full flex bg-[#F6F6F4]">
 
-      {/* LEFT IMAGE */}
       <div className="w-1/2">
-        <img src="/src/assets/Image.png" className="w-full h-full object-cover" />
+        <img
+          src="/src/assets/Image.png"
+          className="w-full h-full object-cover"
+        />
       </div>
 
-      {/* RIGHT FORM */}
-      <div className="w-1/2 flex items-center justify-center">
+      <div className="w-1/2 flex justify-end">
 
-        <div className="w-[448px] bg-white rounded-[32px] p-8 flex flex-col gap-10">
+        <div className="w-[448px] h-screen bg-white rounded-l-[32px] px-8 flex items-center">
 
-          {/* LOGO */}
-          <div className="flex justify-center">
-            <LeftNavigation />
-          </div>
+          <div className="w-full flex flex-col justify-center items-center gap-10">
 
-          {/* TITLE */}
-          <div className="text-center">
-            <h1 className="text-[32px] font-bold text-[#071015]">
-              Hello!
-            </h1>
-            <p className="text-[#071015] font-light">
-              Please enter your details
-            </p>
-          </div>
-
-          {/* INPUTS */}
-          <div className="flex flex-col gap-4">
-
-            <div className="flex gap-4">
-              <Input label="Name" value={name} onChange={setName} />
-              <Input label="Surname" value={surname} onChange={setSurname} />
+            <div className="flex justify-center">
+              <LeftNavigation />
             </div>
 
-            <Input label="E-mail" value={email} onChange={setEmail} />
+            <div className="text-center">
+              <h1 className="text-[32px] font-bold text-[#071015]">
+                Hello!
+              </h1>
+              <p className="text-[#071015] font-light">
+                Please enter your details
+              </p>
+            </div>
 
-            <Input
-              label="Password"
-              type="password"
-              value={password}
-              onChange={setPassword}
-            />
+            <div className="flex flex-col gap-4 w-full">
 
-            <Input
-              label="Repeat password"
-              type="password"
-              value={repeatPassword}
-              onChange={setRepeatPassword}
-            />
+              <Input
+                label="Username"
+                value={username}
+                onChange={setUser}
+              />
 
-            {/* BUTTON */}
-            <Button
-              variant="primary"
-              onClick={handleSubmit}
-              disabled={loading}
-            >
-              {loading ? "Loading..." : "Sign up"}
-            </Button>
+              <Input
+                label="Password"
+                type="password"
+                value={password}
+                onChange={setPassword}
+              />
+
+              <Button
+                variant="primary"
+                onClick={handleSubmit}
+                disabled={loading}
+              >
+                {loading ? "Loading..." : "Sign up"}
+              </Button>
+
+            </div>
+
+            <div className="text-center text-sm">
+              <span>Already have an account? </span>
+               <Link
+                to="/login"
+                className="font-bold text-[#071015]"
+              >
+                Login
+              </Link>
+            </div>
 
           </div>
-
-          {/* FOOTER */}
-          <div className="text-center text-sm">
-            <span>Already have an account? </span>
-            <span className="font-bold cursor-pointer">
-              Log in
-            </span>
-          </div>
-
         </div>
       </div>
     </div>
