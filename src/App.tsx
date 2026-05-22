@@ -11,12 +11,15 @@ import EditAuction from './pages/EditAuction.tsx';
 import ProtectedRoute from './components/ProtectedRoute';
 import ErrorBanner from './components/ErrorBanner';
 
+import { Navigate } from "react-router-dom";
+
 
 function App() {
   return (
     <BrowserRouter>
       <ErrorBanner />
         <Routes> 
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/auctions" element={<Auctions />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
