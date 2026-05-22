@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import api from "../api/axios";
 
 import NavBar from "../components/ui/NavBar";
-import Card from "../components/ui/Cardv2";
+import Card from "../components/ui/Card";
 import Tab from "../components/ui/Tab";
 
 import type { Auction } from "../types/Auction";

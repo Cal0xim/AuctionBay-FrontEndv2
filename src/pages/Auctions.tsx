@@ -5,7 +5,7 @@ import { useError } from "../utils/ErrorDisplay";
 import type { Auction } from "../types/Auction"
 
 import NavBar from "../components/ui/NavBar";
-import Card from "../components/ui/Cardv2";
+import Card from "../components/ui/Card";
 
 function Auctions() {
   const [auctions, setAuctions] = useState<Auction[]>([]);

@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import api from "../api/axios";
 
 import NavBar from "../components/ui/NavBar";
-import Tag from "../components/ui/Tagv2";
+import Tag from "../components/ui/Tag";
 import TimeTag from "../components/ui/TimeTag";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
